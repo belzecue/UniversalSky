@@ -1,7 +1,7 @@
 [gd_resource type="Environment" format=2]
 
 [resource]
-ambient_light_color = Color( 0.351259, 0.40209, 0.500003, 0.500219 )
+ambient_light_color = Color( 0.426715, 0.334728, 0.286173, 0.578285 )
 fog_color = Color( 0.74902, 0.752941, 1, 1 )
 fog_depth_curve = 0.732043
 tonemap_mode = 3

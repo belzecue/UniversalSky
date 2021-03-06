@@ -203,7 +203,7 @@ vec3 atmosphericScattering(float sr, float sm, vec2 mu, vec3 mult){
 // Clouds based in Danil work.
 // MIT License.
 // See: https://github.com/danilw/godot-utils-and-other/tree/master/Dynamic%20sky%20and%20reflection.
-float noise(vec3 p){
+float noiseClouds(vec3 p){
 	vec3 pos = vec3(p * 0.01);
 	pos.z *= 256.0;
 	vec2 offset = vec2(0.317, 0.123);
@@ -215,26 +215,27 @@ float noise(vec3 p){
 	return mix(x1, x2, fract(pos.z));
 }
 
-float fbm(vec3 p, float l){
+float cloudsFBM(vec3 p, float l){
 	float ret;
-	ret = 0.51749673 * noise(p);  
+	ret = 0.51749673 * noiseClouds(p);  
 	p *= l;
-	ret += 0.25584929 * noise(p); 
+	ret += 0.25584929 * noiseClouds(p); 
 	p *= l; 
-	ret += 0.12527603 * noise(p); 
+	ret += 0.12527603 * noiseClouds(p); 
 	p *= l;
-	ret += 0.06255931 * noise(p);
+	ret += 0.06255931 * noiseClouds(p);
 	return ret;
 }
 
-float getNoiseClouds(vec3 p){
+
+float noiseCloudsFBM(vec3 p){
 	float freq = _clouds_noise_freq; //2.76434;
-	return fbm(p, freq);
+	return cloudsFBM(p, freq);
 }
 
 float cloudsDensity(vec3 p, vec3 offset, float t){
 	vec3 pos = p * 0.0212242 + offset;
-	float dens = getNoiseClouds(pos);
+	float dens = noiseCloudsFBM(pos);
 	float cov = 1.0 - _clouds_coverage;
 	dens *= smoothstep(cov, cov + t, dens);
 	return saturate(dens);
@@ -243,6 +244,7 @@ float cloudsDensity(vec3 p, vec3 offset, float t){
 vec4 renderClouds(vec3 pos, float tm){
 	vec4 ret;
 	pos.xy = pos.xz / pos.y;
+	pos *= _clouds_size;
 	vec3 wind = _clouds_offset * (tm * _clouds_offset_speed);
 	
 	float marchStep = float(kCLOUDS_STEP) * _clouds_thickness;

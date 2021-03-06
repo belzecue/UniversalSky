@@ -74,6 +74,19 @@ signal year_changed(value)
 #---------------------
 # Planetary.
 #---------------------
+
+# Calculations type.
+enum CelestialCalculationsMode{
+	Simple = 0,
+	Realistic
+}
+var celestial_calculations: int = 0 setget set_celestial_calculations
+func set_celestial_calculations(value: int) -> void:
+	celestial_calculations = value
+	if Engine.editor_hint:
+		_set_celestials_coords()
+		property_list_changed_notify() 
+
 # Location.
 var latitude: float  = 42.0 setget set_latitude
 func set_latitude(value: float) -> void:
@@ -96,7 +109,19 @@ func set_utc(value: float) -> void:
 var celestials_update_time: float = 0.0
 var _celestials_update_timer: float
 
-var compute_moon_coords: bool = false
+var compute_moon_coords: bool = false setget set_compute_moon_coords
+func set_compute_moon_coords(value: bool) -> void:
+	compute_moon_coords = value
+	if Engine.editor_hint:
+		_set_celestials_coords()
+		property_list_changed_notify()
+
+var moon_coords_offset:= Vector2.ZERO setget set_moon_coords_offset
+func set_moon_coords_offset(value: Vector2) -> void:
+	moon_coords_offset = value
+	if Engine.editor_hint:
+		_set_celestials_coords()
+
 var _sun_coords: Vector2
 var _moon_coords: Vector2
 var _latitude_rad: float
@@ -226,14 +251,37 @@ func _check_cycle() -> void:
 
 func _set_celestials_coords():
 	if sky_node_found:
-		_compute_sun_coordinates()
-		sky_node.sun_altitude = _sun_coords.y * SkyMath.RAD_2_DEG
-		sky_node.sun_azimuth = _sun_coords.x * SkyMath.RAD_2_DEG
-		
-		if compute_moon_coords:
-			_compute_moon_coordinates()
-			sky_node.moon_altitude = _moon_coords.y * SkyMath.RAD_2_DEG
-			sky_node.moon_azimuth = _moon_coords.x * SkyMath.RAD_2_DEG
+		match celestial_calculations:
+			CelestialCalculationsMode.Realistic:
+				_compute_sun_coordinates()
+				sky_node.sun_altitude = _sun_coords.y * SkyMath.RAD_2_DEG
+				sky_node.sun_azimuth = _sun_coords.x * SkyMath.RAD_2_DEG
+				if compute_moon_coords:
+					_compute_moon_coordinates()
+					sky_node.moon_altitude = _moon_coords.y * SkyMath.RAD_2_DEG
+					sky_node.moon_azimuth = _moon_coords.x * SkyMath.RAD_2_DEG
+			
+			CelestialCalculationsMode.Simple:
+				_compute_simple_sun_coordinates()
+				sky_node.sun_altitude = _sun_coords.y
+				sky_node.sun_azimuth = _sun_coords.x
+				if compute_moon_coords:
+					_compute_simple_moon_coordinates()
+					sky_node.moon_altitude = _moon_coords.y
+					sky_node.moon_azimuth = _moon_coords.x
+					
+
+func _compute_simple_sun_coordinates() -> void:
+	_set_total_hours_utc(); 
+	_set_latitude_rad()
+	var t = _total_hours_utc + (SkyMath.DEG_2_RAD * longitude)
+	var alt = t * (360/24);
+	_sun_coords.y = (180.0) -alt;
+	_sun_coords.x = latitude
+
+func _compute_simple_moon_coordinates() -> void:
+	_moon_coords.y = (180.0 - _sun_coords.y) + moon_coords_offset.y
+	_moon_coords.x = (180.0 + _sun_coords.x) + moon_coords_offset.x
 
 # x = azimuth y = altitude.
 func _compute_sun_coordinates() -> void:
@@ -442,7 +490,11 @@ func _get_property_list() -> Array:
 	ret.push_back({name = "year", type=TYPE_INT, hint=PROPERTY_HINT_RANGE, hint_string="-9999, 9999"})
 	
 	ret.push_back({name = "Planetary And Location", type=TYPE_NIL, usage=PROPERTY_USAGE_GROUP})
+	ret.push_back({name = "celestial_calculations", type=TYPE_INT, hint=PROPERTY_HINT_ENUM, hint_string="Simple, Realistic"})
 	ret.push_back({name = "compute_moon_coords", type=TYPE_BOOL})
+	
+	if celestial_calculations == 0 && compute_moon_coords:
+		ret.push_back({name = "moon_coords_offset", type=TYPE_VECTOR2})
 	
 	ret.push_back({name = "latitude", type=TYPE_REAL, hint=PROPERTY_HINT_RANGE, hint_string="-90.0, 90.0"})
 	ret.push_back({name = "longitude", type=TYPE_REAL, hint=PROPERTY_HINT_RANGE, hint_string="-180.0, 180.0"})

@@ -1,9 +1,18 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://addons/jc.godot.universal-sky-common/Examples/Scenes/PrimitivesBase.tscn" type="PackedScene" id=1]
 [ext_resource path="res://addons/jc.godot.universal-sky/Code/Sky/SkyManager.gd" type="Script" id=2]
 [ext_resource path="res://addons/jc.godot.universal-sky/Examples/EnviroTest.tres" type="Environment" id=9]
 [ext_resource path="res://addons/jc.godot.universal-sky/Code/TimeOfDay/TimeOfDay.gd" type="Script" id=10]
+
+[sub_resource type="OpenSimplexNoise" id=1]
+period = 0.1
+persistence = 0.0
+lacunarity = 2.91
+
+[sub_resource type="NoiseTexture" id=2]
+seamless = true
+noise = SubResource( 1 )
 
 [node name="Main" type="Spatial"]
 
@@ -12,12 +21,13 @@ transform = Transform( 0.0426777, -0.263263, -0.96378, 0, 0.964659, -0.263503, 0
 far = 5000.0
 
 [node name="SunLight" type="DirectionalLight" parent="."]
-transform = Transform( 0.0628577, 0.997586, -0.0295032, 0, 0.0295617, 0.999563, 0.998023, -0.0628302, 0.00185818, -0.0295031, 0.999563, 0.00185828 )
-light_color = Color( 0.984314, 0.843137, 0.788235, 1 )
+transform = Transform( 0, -0.0219894, 0.999758, -4.54765e-06, -0.999758, -0.0219894, 1, -4.54655e-06, -1e-07, 0.999758, -0.0219893, 6.12175e-17 )
+light_color = Color( 0.996423, 0.488931, 0.367425, 1 )
+light_energy = 0.228011
 shadow_enabled = true
 
 [node name="MoonLight" type="DirectionalLight" parent="."]
-transform = Transform( 0, -0.24241, -0.970174, 0.992152, -0.121307, 0.0303101, -0.125037, -0.96256, 0.240508, -0.970174, 0.0303102, 0.240508 )
+transform = Transform( 0, -0.249957, -0.968257, -4.00068e-07, -0.968257, 0.249957, -1, 3.87369e-07, -1e-07, -0.968257, 0.249958, -1.77866e-16 )
 visible = false
 light_color = Color( 0.572549, 0.776471, 0.956863, 1 )
 light_energy = 0.0
@@ -42,12 +52,14 @@ interior_ambient_color = Color( 0.172549, 0.2, 0.321569, 1 )
 script = ExtResource( 10 )
 system_sync = false
 total_cycle_in_minutes = 0.5
-total_hours = 6.947
+total_hours = 5.916
 day = 11
 month = 3
 year = 2021
+celestial_calculations = 0
 compute_moon_coords = true
-latitude = 0.0
+moon_coords_offset = Vector2( 0, 0 )
+latitude = 90.0
 longitude = 0.0
 utc = 0.0
 celestials_update_time = 0.0
@@ -63,8 +75,8 @@ exposure = 1.3
 ground_color = Color( 0.3, 0.3, 0.3, 1 )
 sky_layers = 4
 sky_render_priority = -128
-sun_altitude = -1.694
-sun_azimuth = 93.6041
+sun_altitude = 91.26
+sun_azimuth = 90.0
 sun_disk_color = Color( 0.996094, 0.541334, 0.140076, 1 )
 sun_disk_multiplier = 2.0
 sun_disk_size = 0.015
@@ -72,30 +84,30 @@ sun_light_path = NodePath("../SunLight")
 sun_light_color = Color( 0.984314, 0.843137, 0.788235, 1 )
 sun_horizon_light_color = Color( 1, 0.384314, 0.243137, 1 )
 sun_light_energy = 1.0
-moon_altitude = 111.379
-moon_azimuth = 284.335
-moon_color = Color( 1, 1, 1, 0.529412 )
-moon_size = 0.07
-moon_texture_size = 2
+moon_altitude = 88.74
+moon_azimuth = 270.0
+moon_color = Color( 1, 1, 1, 1 )
+moon_size = 0.078
+moon_texture_size = 4
 enable_set_moon_texture = false
 moon_light_path = NodePath("../MoonLight")
 moon_light_color = Color( 0.572549, 0.776471, 0.956863, 1 )
 moon_light_energy = 0.3
 deep_space_follow_sun = true
-deep_space_euler = Vector3( 0.0628716, 1.56893, 1.54117 )
-background_color = Color( 0.19, 0.19, 0.19, 0.3 )
+deep_space_euler = Vector3( 4.54579e-06, 1.5708, -3.1196 )
+background_color = Color( 0.745098, 0.745098, 0.745098, 1 )
 enable_set_background_texture = false
 stars_field_color = Color( 1, 1, 1, 1 )
 enable_set_stars_field_texture = false
-stars_scintillation = 0.75
-stars_scintillation_speed = 0.01
-atm_darkness = 0.623
+stars_scintillation = 1.0
+stars_scintillation_speed = 0.02
+atm_darkness = 0.5
 atm_wavelenghts = Vector3( 680, 550, 440 )
 atm_sun_intensity = 30.0
-atm_day_tint = Color( 0.701961, 0.803922, 1, 1 )
-atm_horizon_light_tint = Color( 0.988235, 0.698039, 0.505882, 1 )
+atm_day_tint = Color( 0.721569, 0.811765, 0.988235, 1 )
+atm_horizon_light_tint = Color( 0.964706, 0.690196, 0.509804, 1 )
 atm_night_scatter_mode = 0
-atm_night_tint = Color( 0.168627, 0.2, 0.25098, 1 )
+atm_night_tint = Color( 0.309804, 0.368627, 0.466667, 1 )
 atm_params = Vector3( 1, 0, 0 )
 atm_thickness = 0.7
 atm_mie = 0.07
@@ -104,22 +116,23 @@ atm_sun_mie_tint = Color( 0.972549, 0.796078, 0.67451, 1 )
 atm_sun_mie_intensity = 1.0
 atm_sun_mie_anisotropy = 0.8
 atm_moon_mie_tint = Color( 0.137255, 0.184314, 0.290196, 1 )
-atm_moon_mie_intensity = 0.7
-atm_moon_mie_anisotropy = 0.8
+atm_moon_mie_intensity = 1.0
+atm_moon_mie_anisotropy = 0.784
 fog_visible = true
-fog_density = 0.00274377
-fog_rayleigh_depth = 0.00699294
-fog_mie_depth = 0.00071
+fog_density = 0.00494602
+fog_rayleigh_depth = 0.0940857
+fog_mie_depth = 0.000251023
 fog_layers = 524288
 fog_render_priority = 123
-clouds_thickness = 0.02
-clouds_coverage = 0.723
-clouds_absorption = 33.63
-clouds_noise_frequency = 2.7
-clouds_sky_tint_fade = 0.482
-clouds_intensity = 34.842
-clouds_size = 15.0
-clouds_offset = Vector3( 1, 0, 1 )
-clouds_offset_speed = 0.01
-clouds_enable_set_texture = false
+clouds_thickness = 0.009
+clouds_coverage = 0.484
+clouds_absorption = 59.35
+clouds_noise_frequency = 2.38
+clouds_sky_tint_fade = 1.0
+clouds_intensity = 40.0
+clouds_size = 2.838
+clouds_offset = Vector3( -0.682, -0.347, -0.076 )
+clouds_offset_speed = 0.016
+clouds_enable_set_texture = true
+clouds_texture = SubResource( 2 )
 enviro = ExtResource( 9 )
